@@ -30,6 +30,7 @@ class Crawler(object):
         return contents
 
     def crawl_page(self, start_date, end_date, page=''):
+        print("hello world")
         """Parse ten rows of the given page
 
         Parameters:
