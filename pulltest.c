@@ -1,6 +1,7 @@
 #include<stdio.h>
 
 int main(){
-  printf("I can't write code");
+  printf("I can't write code\n);
+  printf("Me, too....\n");
   return 0;
 }
