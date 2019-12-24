@@ -1,4 +1,4 @@
-
+import requests
 
 
 class Crawler(object):
@@ -11,7 +11,6 @@ class Crawler(object):
     def crawl(self, start_date, end_date,
               date_thres=datetime(2012, 1, 1)):
         """Main crawl API
-
         1. Note that you need to sleep 0.1 seconds for any request.
         2. It is welcome to modify TA's template.
         """
@@ -30,14 +29,12 @@ class Crawler(object):
         return contents
 
     def crawl_page(self, start_date, end_date, page=''):
-        print("hello world")
+        #print("hello world")
         """Parse ten rows of the given page
-
         Parameters:
             start_date (datetime): the start date (included)
             end_date (datetime): the end date (included)
             page (str): the relative url specified page num
-
         Returns:
             content (list): a list of date, title, and content
             last_date (datetime): the smallest date in the page
@@ -59,8 +56,14 @@ class Crawler(object):
         return contents, last_date
 
     def crawl_content(self, url):
+        t = requests.get(url);
+        print(t.status_code)
+        t.headers['Content-Type']
+        
+        t.encoding = 'utf-8'
+        print(t.text)
+        
         """Crawl the content of given url
-
         For example, if the url is
         https://www.csie.ntu.edu.tw/news/news.php?Sn=15216
         then you are to crawl contents of
