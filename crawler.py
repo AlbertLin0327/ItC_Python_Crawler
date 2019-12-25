@@ -45,22 +45,28 @@ class Crawler(object):
                      'zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7,zh-CN;q=0.6'}
         ).content.decode()
         sleep(0.1)
-        # TODO: parse the response and get dates, titles and relative url with etree
+        # Todo add by Hermes: I know what to do below this line, but some technique problems are still required solution to solve. 
+        html = etree.HTML(res)
+        
         contents = list()
         for rel_url in rel_urls:
-            # TODO: 1. concatenate relative url to full url
-            #       2. for each url call self.crawl_content
-            #          to crawl the content
-            #       3. append the date, title and content to
-            #          contents
+            title = html.xpath('/html/body/div[1]/div/div[2]/div/div/div[2]/div/table/tbody/tr['+ str(i) + ']/td[2]/a/text()')
+            date = html.xpath('/html/body/div[1]/div/div[2]/div/div/div[2]/div/table/tbody/tr[' + str(i) + ']/td[1]/text()')
+            content = crawl_content(self, rel_url)
+        # Todo add by Hermes: makes 'content' into a list called 'contents' amd return
         return contents, last_date
 
     def crawl_content(self, url):
-        t = requests.get(url, params = [('q', 'requests+language:python')]).content.decode();
-        #t.headers['Content-Type']
-        
-        #t.encoding = 'utf-8'
-        #print(t.text)
+        t = requests.get(url).content.decode();
+        html = etree.HTML(t)
+        content = html.xpath('/html/body/div[1]/div/div[2]/div/div/div[2]/div/div[2]/text()')
+        attach_file = html.xpath('/html/body/div[1]/div/div[2]/div/div/div[2]/div/div[3]/ul/li/a[1]/text()')
+        #print(content, '\n', attach_file, '\n')
+
+        # Todo add by Hermes:　I haven't figure out how to get the while contents recursivel as TA mentioned,
+        # Its xpath is to complicate for me to do it one by one. I need more time to think about it
+        final = content + '\n' + attach_file + '\n'
+        return final
         
         """Crawl the content of given url
         For example, if the url is
