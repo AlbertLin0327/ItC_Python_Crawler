@@ -1,5 +1,4 @@
-
-
+import requests
 
 class Crawler(object):
     def __init__(self,
@@ -11,7 +10,6 @@ class Crawler(object):
     def crawl(self, start_date, end_date,
               date_thres=datetime(2012, 1, 1)):
         """Main crawl API
-
         1. Note that you need to sleep 0.1 seconds for any request.
         2. It is welcome to modify TA's template.
         """
@@ -30,13 +28,12 @@ class Crawler(object):
         return contents
 
     def crawl_page(self, start_date, end_date, page=''):
+        #print("hello world")
         """Parse ten rows of the given page
-
         Parameters:
             start_date (datetime): the start date (included)
             end_date (datetime): the end date (included)
             page (str): the relative url specified page num
-
         Returns:
             content (list): a list of date, title, and content
             last_date (datetime): the smallest date in the page
@@ -47,22 +44,21 @@ class Crawler(object):
                      'zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7,zh-CN;q=0.6'}
         ).content.decode()
         sleep(0.1)
-        # TODO: parse the response and get dates, titles and relative url with etree
+        # Todo add by Hermes: I know what to do below this line, but some technique problems are still required solution to solve. 
+        html = etree.HTML(res)
+        
         contents = list()
         for rel_url in rel_urls:
-            # TODO: 1. concatenate relative url to full url
-            #       2. for each url call self.crawl_content
-            #          to crawl the content
-            #       3. append the date, title and content to
-            #          contents
+            title = html.xpath('/html/body/div[1]/div/div[2]/div/div/div[2]/div/table/tbody/tr['+ str(i) + ']/td[2]/a/text()')
+            date = html.xpath('/html/body/div[1]/div/div[2]/div/div/div[2]/div/table/tbody/tr[' + str(i) + ']/td[1]/text()')
+            content = crawl_content(self, rel_url)
+        # Todo add by Hermes: makes 'content' into a list called 'contents' amd return
+        contents = list(content)
         return contents, last_date
 
     def crawl_content(self, url):
-        """Crawl the content of given url
+        t = requests.get(url).content.decode();
+        html = etree.HTML(t)
 
-        For example, if the url is
-        https://www.csie.ntu.edu.tw/news/news.php?Sn=15216
-        then you are to crawl contents of
-        ``Title : 我與DeepMind的A.I.研究之路, My A.I. Journey with DeepMind Date : 2019-12-27 2:20pm-3:30pm Location : R103, CSIE Speaker : 黃士傑博士, DeepMind Hosted by : Prof. Shou-De Lin Abstract: 我將與同學們分享，我博士班研究到加入DeepMind所參與的projects (AlphaGo, AlphaStar與AlphaZero)，以及從我個人與DeepMind的視角對未來AI發展的展望。 Biography: 黃士傑, Aja Huang 台灣人，國立臺灣師範大學資訊工程研究所博士，現為DeepMind Staff Research Scientist。``
-        """
-        raise NotImplementedError
+        return html.xpath(string('/html/body//div[@id="content"]'))
+        
