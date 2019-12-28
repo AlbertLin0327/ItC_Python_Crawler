@@ -1,4 +1,7 @@
 import requests
+from lxml import etree
+from datetime import datetime
+from time import sleep
 
 class Crawler(object):
     def __init__(self,
@@ -46,19 +49,28 @@ class Crawler(object):
         sleep(0.1)
         # Todo add by Hermes: I know what to do below this line, but some technique problems are still required solution to solve. 
         html = etree.HTML(res)
-        
+        xpath = '/html/body/div[1]/div/div[2]/div/div/div[2]/div/table/tbody'
+        root = parser.xpath(xpath)[0]
+        dates = root.xpath('//tr/td[1]/text()')
+        titles = root.xpath('//tr/td[2]/a/text()')
+        rel_urls = root.xpath('//tr/td[2]/a/@href')
         contents = list()
-        for rel_url in rel_urls:
-            title = html.xpath('/html/body/div[1]/div/div[2]/div/div/div[2]/div/table/tbody/tr['+ str(i) + ']/td[2]/a/text()')
-            date = html.xpath('/html/body/div[1]/div/div[2]/div/div/div[2]/div/table/tbody/tr[' + str(i) + ']/td[1]/text()')
-            content = crawl_content(self, rel_url)
+        for i, (date, title, rel_url) in enumerate(zip(dates , titles, rel_urls)):
+            date = datetime.strptime(date, '%Y-%m-%d')
+            if start_date <= date <= end_date:
+                url = self.base_url + rel_url
+                content = self.crawl_content(self, rel_url)
+                contents.append((date, title, content))
+                if i == len(dates) - 1:
+                    last_date = date
         # Todo add by Hermes: makes 'content' into a list called 'contents' amd return
-        contents = list(content)
+        
         return contents, last_date
 
     def crawl_content(self, url):
         t = requests.get(url).content.decode();
         html = etree.HTML(t)
-
-        return html.xpath(string('/html/body//div[@id="content"]'))
+        xpath = '//div[1]/div[2]/div/div/div[2]/div/div[2]//text()'
+        content = html.xpath(xpath)
+        return ' '.join(content)
         
