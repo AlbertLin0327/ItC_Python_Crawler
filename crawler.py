@@ -60,6 +60,7 @@ class Crawler(object):
         t = requests.get(url).content.decode();
         html = etree.HTML(t)
         content = html.xpath('/html/body/div[1]/div/div[2]/div/div/div[2]/div/div[2]/text()')
+		#content = html.xpath('/html/body//div[@id="content"]')
         attach_file = html.xpath('/html/body/div[1]/div/div[2]/div/div/div[2]/div/div[3]/ul/li/a[1]/text()')
         #print(content, '\n', attach_file, '\n')
 
