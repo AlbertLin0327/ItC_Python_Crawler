@@ -1,5 +1,6 @@
 import requests
-from lxml import etree
+#from lxml import etree
+import lxml.etree
 from datetime import datetime
 from time import sleep
 
@@ -50,7 +51,7 @@ class Crawler(object):
         # Todo add by Hermes: I know what to do below this line, but some technique problems are still required solution to solve. 
         html = etree.HTML(res)
         xpath = '/html/body/div[1]/div/div[2]/div/div/div[2]/div/table/tbody'
-        root = parser.xpath(xpath)[0]
+        root = html.xpath(xpath)[0]
         dates = root.xpath('//tr/td[1]/text()')
         titles = root.xpath('//tr/td[2]/a/text()')
         rel_urls = root.xpath('//tr/td[2]/a/@href')
@@ -59,11 +60,11 @@ class Crawler(object):
             date = datetime.strptime(date, '%Y-%m-%d')
             if start_date <= date <= end_date:
                 url = self.base_url + rel_url
-                content = self.crawl_content(self, rel_url)
+                content = self.crawl_content(url)
                 contents.append((date, title, content))
-                if i == len(dates) - 1:
+                if i + 1 == len(dates):
                     last_date = date
-        # Todo add by Hermes: makes 'content' into a list called 'contents' amd return
+        # Todo add by Hermes: makes 'content' into a list called 'contents' and return
         
         return contents, last_date
 
