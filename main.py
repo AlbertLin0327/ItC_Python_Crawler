@@ -5,7 +5,11 @@ import csv
 if __name__ == '__main__':
 	args = get_args()
 	crawler = Crawler()
-	content = crawler.crawl(args.start_date, args.end_date)
+	contents = crawler.crawl(args.start_date, args.end_date)
 	# TODO: write content to file according to spec
 	with open(args.output, 'w') as f:
-		f.write(str(content))
+		for date, title, content in contents:
+			title = title.replace(' ', '')
+			content = content.replace(' ' , '')
+			outstr = f'{str(date)}\n\t{title}\n\t{content}\n'
+			f.write(outstr)
