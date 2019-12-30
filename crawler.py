@@ -48,22 +48,20 @@ class Crawler(object):
         ).content.decode()
         sleep(0.1)
         # Todo add by Hermes: I know what to do below this line, but some technique problems are still required solution to solve. 
-        html = etree.HTML(res)
-        xpath = '/html/body/div[1]/div/div[2]/div/div/div[2]/div/table/tbody'
-        root = html.xpath(xpath)[0]
-        dates = root.xpath('//tr/td[1]/text()')
-        titles = root.xpath('//tr/td[2]/a/text()')
-        rel_urls = root.xpath('//tr/td[2]/a/@href')
+        root = etree.HTML(res)  
+        dates = root.xpath('/html/body/div[1]/div/div[2]/div/div/div[2]/div/table/tbody/tr/td[1]/text()')
+        titles = root.xpath('/html/body/div[1]/div/div[2]/div/div/div[2]/div/table/tbody/tr/td[2]/a/text()')
+        rel_urls = root.xpath('/html/body/div[1]/div/div[2]/div/div/div[2]/div/table/tbody/tr/td[2]/a/@href')
         contents = list()
-        for i, (date, title, rel_url) in enumerate(zip(dates , titles, rel_urls)):
+        last_date = start_date
+        for date, title, rel_url in zip(dates , titles, rel_urls):
             date = datetime.strptime(date, '%Y-%m-%d')
             if start_date <= date <= end_date:
                 url = self.base_url + rel_url
                 content = self.crawl_content(url)
                 contents.append((date, title, content))
-                if i + 1 == len(dates):
-                    last_date = date
-            else
+            else:
+                last_date = date
                 break
         # Todo add by Hermes: makes 'content' into a list called 'contents' and return
         

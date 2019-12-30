@@ -8,7 +8,4 @@ if __name__ == '__main__':
 	content = crawler.crawl(args.start_date, args.end_date)
 	# TODO: write content to file according to spec
 	with open(args.output, 'w') as f:
-		f_out = f.write(f)
-		f_out.writerow(['date', 'title', 'content'])
-		for row in content:
-			f_out.writerow(row)
+		f.write(str(content))
