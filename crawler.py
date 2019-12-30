@@ -1,5 +1,7 @@
 import requests
-
+from lxml import etree
+from datetime import datetime
+from time import sleep
 
 class Crawler(object):
     def __init__(self,
@@ -46,33 +48,29 @@ class Crawler(object):
         ).content.decode()
         sleep(0.1)
         # Todo add by Hermes: I know what to do below this line, but some technique problems are still required solution to solve. 
-        html = etree.HTML(res)
-        
+        root = etree.HTML(res)  
+        dates = root.xpath('/html/body/div[1]/div/div[2]/div/div/div[2]/div/table/tbody/tr/td[1]/text()')
+        titles = root.xpath('/html/body/div[1]/div/div[2]/div/div/div[2]/div/table/tbody/tr/td[2]/a/text()')
+        rel_urls = root.xpath('/html/body/div[1]/div/div[2]/div/div/div[2]/div/table/tbody/tr/td[2]/a/@href')
         contents = list()
-        for rel_url in rel_urls:
-            title = html.xpath('/html/body/div[1]/div/div[2]/div/div/div[2]/div/table/tbody/tr['+ str(i) + ']/td[2]/a/text()')
-            date = html.xpath('/html/body/div[1]/div/div[2]/div/div/div[2]/div/table/tbody/tr[' + str(i) + ']/td[1]/text()')
-            content = crawl_content(self, rel_url)
-        # Todo add by Hermes: makes 'content' into a list called 'contents' amd return
+        last_date = start_date
+        for date, title, rel_url in zip(dates , titles, rel_urls):
+            date = datetime.strptime(date, '%Y-%m-%d')
+            if start_date <= date <= end_date:
+                url = self.base_url + rel_url
+                content = self.crawl_content(url)
+                contents.append((date, title, content))
+            else:
+                last_date = date
+                break
+        # Todo add by Hermes: makes 'content' into a list called 'contents' and return
+        
         return contents, last_date
 
     def crawl_content(self, url):
         t = requests.get(url).content.decode();
         html = etree.HTML(t)
-        content = html.xpath('/html/body/div[1]/div/div[2]/div/div/div[2]/div/div[2]/text()')
-        attach_file = html.xpath('/html/body/div[1]/div/div[2]/div/div/div[2]/div/div[3]/ul/li/a[1]/text()')
-        #print(content, '\n', attach_file, '\n')
-
-        # Todo add by Hermes:　I haven't figure out how to get the while contents recursivel as TA mentioned,
-        # Its xpath is to complicate for me to do it one by one. I need more time to think about it
-        final = content + '\n' + attach_file + '\n'
-        return final
+        xpath = '//div[1]/div[2]/div/div/div[2]/div/div[2]//text()'
+        content = html.xpath(xpath)
+        return ' \n'.join(content)
         
-        """Crawl the content of given url
-        For example, if the url is
-        https://www.csie.ntu.edu.tw/news/news.php?Sn=15216
-        then you are to crawl contents of
-        ``Title : 我與DeepMind的A.I.研究之路, My A.I. Journey with DeepMind Date : 2019-12-27 2:20pm-3:30pm Location : R103, CSIE Speaker : 黃士傑博士, DeepMind Hosted by : Prof. Shou-De Lin Abstract: 我將與同學們分享，我博士班研究到加入DeepMind所參與的projects (AlphaGo, AlphaStar與AlphaZero)，以及從我個人與DeepMind的視角對未來AI發展的展望。 Biography: 黃士傑, Aja Huang 台灣人，國立臺灣師範大學資訊工程研究所博士，現為DeepMind Staff Research Scientist。``
-        """
-        raise NotImplementedError
-
