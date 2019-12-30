@@ -1,6 +1,5 @@
 import requests
-#from lxml import etree
-import lxml.etree
+from lxml import etree
 from datetime import datetime
 from time import sleep
 
@@ -64,6 +63,8 @@ class Crawler(object):
                 contents.append((date, title, content))
                 if i + 1 == len(dates):
                     last_date = date
+            else
+                break
         # Todo add by Hermes: makes 'content' into a list called 'contents' and return
         
         return contents, last_date
