@@ -72,5 +72,6 @@ class Crawler(object):
         html = etree.HTML(t)
         xpath = '//div[1]/div[2]/div/div/div[2]/div/div[2]//text()'
         content = html.xpath(xpath)
-        return ' \n'.join(content)
+
+        return ''.join(content).replace('\xa0', '').replace('\r', '')
         
